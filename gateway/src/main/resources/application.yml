@@ -1,0 +1,68 @@
+server:
+  port: 8088
+
+---
+
+spring:
+  profiles: default
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8090/.well-known/jwks.json
+  cloud:
+    gateway:
+      routes:
+         - id: order
+           uri: http://localhost:8081
+           predicates:
+            - Path=/orders/** /productLists/**
+         - id: delivery
+           uri: http://localhost:8082
+           predicates:
+            - Path=/shippings/** 
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "*"
+            allowedMethods:
+              - "*"
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
+
+---
+
+spring:
+  profiles: docker
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://oauth:8080/.well-known/jwks.json
+  cloud:
+    gateway:
+      routes:
+        - id: order
+          uri: http://order:8080
+          predicates:
+            - Path=/orders/** /productLists/**
+        - id: delivery
+          uri: http://delivery:8080
+          predicates:
+            - Path=/shippings/** 
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "*"
+            allowedMethods:
+              - "*"
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
+server:
+  port: 8080
